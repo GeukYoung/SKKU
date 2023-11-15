@@ -2,14 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def FindEnableCO(CO, t_CO, Visible=False):
-    th_CO = 0.05  # th of CO change in window
+    th_CO = 0.05  # threshold of CO error in window
     wt = 12  # window size: 12 min for CO delay
     wt_datenum = 12/24/60 # convert datenumber 12(min)/24(h)/60(min)
 
     sel_CO = [] # result (logical)
-    rel_dCO = [] # for display
-    mov_max = [] # for display
-    mov_min = [] # for display
+    rel_dCO, mov_max, mov_min = [], [], [] # for display
 
     # window sampling (find start index of each window/stride=1)
     cnt_post = 0
@@ -18,7 +16,7 @@ def FindEnableCO(CO, t_CO, Visible=False):
             if t_CO[cnt] + wt_datenum <= t_CO[cnt_post]:
                 CO_error = (np.max(CO[cnt:cnt_post]) - np.min(CO[cnt:cnt_post])) / np.mean(CO[cnt:cnt_post])
                 sel_CO.append(CO_error < th_CO)
-                if Visible:
+                if Visible: # for display
                     rel_dCO.append(CO_error)
                     mov_max.append(np.max(CO[cnt:cnt_post]))
                     mov_min.append(np.min(CO[cnt:cnt_post]))
@@ -30,7 +28,7 @@ def FindEnableCO(CO, t_CO, Visible=False):
                 else:
                     cnt_post += 1
 
-    if Visible:
+    if Visible: # for display
         plt.subplot(311)
         plt.plot(t_CO, CO, '.')
         plt.plot(t_CO[:len(mov_max)], mov_max)
